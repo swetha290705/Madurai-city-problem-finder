@@ -1,1 +1,1569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Madurai City Problem Finder</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+:root {
+  --bg: #f7f8fc;
+  --surface: #ffffff;
+  --surface2: #f0f2f8;
+  --border: #e4e7f0;
+  --border2: #d0d5e8;
+  --text: #0f172a;
+  --text2: #475569;
+  --text3: #94a3b8;
+  --blue: #2563eb;
+  --blue-light: #eff6ff;
+  --blue-mid: #bfdbfe;
+  --green: #16a34a;
+  --green-light: #f0fdf4;
+  --green-mid: #bbf7d0;
+  --red: #dc2626;
+  --red-light: #fef2f2;
+  --red-mid: #fecaca;
+  --yellow: #d97706;
+  --yellow-light: #fffbeb;
+  --yellow-mid: #fde68a;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font: 'Plus Jakarta Sans', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body, #root { height:100%; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+/* Animations */
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+@keyframes slideRight { from { opacity:0; transform:translateX(-12px); } to { opacity:1; transform:none; } }
+@keyframes popIn { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+@keyframes ripple { 0% { transform:scale(0.8); opacity:0.6; } 100% { transform:scale(2.4); opacity:0; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+.fade-in { animation: fadeIn 0.3s ease; }
+.pop-in { animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+/* Global UI */
+.btn {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:9px 18px; border-radius:var(--radius-sm);
+  font-family:var(--font); font-size:13.5px; font-weight:600;
+  cursor:pointer; border:none; transition:all 0.18s;
+  text-decoration:none; white-space:nowrap;
+}
+.btn-primary { background:var(--blue); color:white; }
+.btn-primary:hover { background:#1d4ed8; transform:translateY(-1px); box-shadow:0 4px 12px rgba(37,99,235,0.35); }
+.btn-secondary { background:var(--surface); color:var(--text2); border:1.5px solid var(--border); }
+.btn-secondary:hover { border-color:var(--blue); color:var(--blue); background:var(--blue-light); }
+.btn-danger { background:var(--red); color:white; }
+.btn-danger:hover { background:#b91c1c; }
+.btn-sm { padding:6px 13px; font-size:12px; }
+.btn-xs { padding:4px 10px; font-size:11px; }
+.badge {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600;
+}
+.badge-red { background:var(--red-light); color:var(--red); border:1px solid var(--red-mid); }
+.badge-yellow { background:var(--yellow-light); color:var(--yellow); border:1px solid var(--yellow-mid); }
+.badge-green { background:var(--green-light); color:var(--green); border:1px solid var(--green-mid); }
+.badge-blue { background:var(--blue-light); color:var(--blue); border:1px solid var(--blue-mid); }
+.badge-dot { width:6px; height:6px; border-radius:50%; }
+.dot-red { background:var(--red); }
+.dot-yellow { background:var(--yellow); }
+.dot-green { background:var(--green); animation:pulse 2s infinite; }
+.dot-blue { background:var(--blue); }
+input, select, textarea {
+  width:100%; padding:10px 13px;
+  border:1.5px solid var(--border); border-radius:var(--radius-sm);
+  font-family:var(--font); font-size:13.5px; color:var(--text);
+  background:var(--surface); outline:none; transition:border-color 0.15s, box-shadow 0.15s;
+}
+input:focus, select:focus, textarea:focus {
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(37,99,235,0.1);
+}
+label { display:block; font-size:12px; font-weight:600; color:var(--text2); margin-bottom:5px; letter-spacing:0.2px; }
+.card {
+  background:var(--surface); border-radius:var(--radius);
+  border:1px solid var(--border); box-shadow:var(--shadow-sm);
+}
 
+/* ===== LAYOUT ===== */
+.app-shell { display:flex; flex-direction:column; height:100vh; }
+
+/* ===== TOPBAR ===== */
+.topbar {
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:0 28px;
+  height:60px;
+  display:flex; align-items:center;
+  gap:20px;
+  flex-shrink:0;
+  box-shadow:var(--shadow-sm);
+  z-index:100;
+  position:sticky; top:0;
+}
+.topbar-logo {
+  display:flex; align-items:center; gap:10px;
+  text-decoration:none; cursor:pointer;
+}
+.logo-mark {
+  width:36px; height:36px;
+  background:linear-gradient(135deg,#2563eb,#3b82f6);
+  border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  color:white; font-size:16px;
+  box-shadow:0 2px 8px rgba(37,99,235,0.3);
+}
+.logo-text { font-size:15px; font-weight:800; color:var(--text); }
+.logo-text span { color:var(--blue); }
+.topbar-nav { display:flex; align-items:center; gap:2px; margin-left:8px; }
+.nav-item {
+  padding:7px 15px; border-radius:8px;
+  font-size:13.5px; font-weight:500; color:var(--text2);
+  cursor:pointer; transition:all 0.15s; border:none; background:none;
+  font-family:var(--font);
+}
+.nav-item:hover { color:var(--blue); background:var(--blue-light); }
+.nav-item.active { color:var(--blue); background:var(--blue-light); font-weight:600; }
+.topbar-right { margin-left:auto; display:flex; align-items:center; gap:12px; }
+.clock-display {
+  display:flex; align-items:center; gap:7px;
+  padding:6px 14px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  font-family:var(--mono); font-size:13px; color:var(--text2);
+  font-weight:500;
+}
+.clock-display i { color:var(--blue); font-size:11px; }
+.user-chip {
+  display:flex; align-items:center; gap:8px;
+  padding:5px 12px 5px 5px;
+  border:1px solid var(--border); border-radius:24px;
+  cursor:pointer; transition:all 0.15s;
+}
+.user-chip:hover { border-color:var(--blue); background:var(--blue-light); }
+.user-avatar-sm {
+  width:28px; height:28px; border-radius:50%;
+  background:linear-gradient(135deg,#f59e0b,#ef4444);
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; color:white;
+}
+.user-chip-name { font-size:12.5px; font-weight:600; color:var(--text); }
+
+/* ===== PAGE WRAPPER ===== */
+.page { flex:1; overflow-y:auto; padding:28px; }
+.page-header { margin-bottom:28px; }
+.page-title { font-size:26px; font-weight:800; color:var(--text); letter-spacing:-0.5px; margin-bottom:4px; }
+.page-subtitle { font-size:14px; color:var(--text3); }
+
+/* ===== HOME PAGE ===== */
+.home-hero {
+  background:linear-gradient(135deg,#eff6ff 0%,#f0fdf4 100%);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:40px 40px;
+  margin-bottom:28px;
+  position:relative;
+  overflow:hidden;
+}
+.home-hero::before {
+  content:'';
+  position:absolute; top:-60px; right:-60px;
+  width:280px; height:280px;
+  background:radial-gradient(circle,rgba(37,99,235,0.08),transparent 70%);
+  border-radius:50%;
+}
+.hero-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 12px; border-radius:20px;
+  background:rgba(37,99,235,0.1); border:1px solid rgba(37,99,235,0.2);
+  color:var(--blue); font-size:11.5px; font-weight:600;
+  margin-bottom:16px;
+}
+.hero-badge-dot { width:6px; height:6px; background:var(--green); border-radius:50%; animation:pulse 2s infinite; }
+.hero-title { font-size:36px; font-weight:800; color:var(--text); line-height:1.15; margin-bottom:10px; letter-spacing:-1px; }
+.hero-title span { color:var(--blue); }
+.hero-desc { font-size:15px; color:var(--text2); max-width:520px; line-height:1.65; margin-bottom:24px; }
+.hero-actions { display:flex; gap:12px; flex-wrap:wrap; }
+.stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+.stat-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:20px 22px; position:relative; overflow:hidden;
+  box-shadow:var(--shadow-sm); transition:all 0.2s;
+}
+.stat-card:hover { transform:translateY(-2px); box-shadow:var(--shadow); }
+.stat-card-accent {
+  position:absolute; top:0; left:0; right:0; height:3px; border-radius:3px 3px 0 0;
+}
+.stat-num { font-size:32px; font-weight:800; line-height:1; margin-bottom:4px; }
+.stat-label { font-size:12px; color:var(--text3); font-weight:500; letter-spacing:0.3px; }
+.stat-icon-wrap {
+  position:absolute; top:20px; right:18px;
+  width:36px; height:36px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center; font-size:16px;
+}
+.stat-sub { font-size:11px; margin-top:6px; }
+
+/* ===== MAP PAGE ===== */
+.map-layout { display:grid; grid-template-columns:1fr 300px; gap:20px; height:calc(100vh - 148px); }
+.map-wrap {
+  position:relative; border-radius:var(--radius);
+  overflow:hidden; border:1px solid var(--border);
+  background:#f0ebe3;
+}
+.madurai-svg { width:100%; height:100%; cursor:crosshair; }
+.map-zone { transition:fill 0.15s; }
+.map-zone:hover { fill:rgba(37,99,235,0.12); cursor:pointer; }
+.map-popup-wrap {
+  position:absolute; z-index:20;
+  pointer-events:none;
+}
+.map-popup-box {
+  background:white; border-radius:var(--radius); padding:16px;
+  box-shadow:var(--shadow-lg); border:1px solid var(--border);
+  width:240px; pointer-events:all;
+  animation:popIn 0.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+.popup-header { display:flex; align-items:flex-start; gap:10px; margin-bottom:12px; }
+.popup-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
+.popup-title { font-size:13px; font-weight:700; color:var(--text); }
+.popup-loc { font-size:11px; color:var(--text3); margin-top:2px; }
+.popup-problems { max-height:200px; overflow-y:auto; }
+.popup-problem-item {
+  padding:8px; background:var(--surface2); border-radius:8px; margin-bottom:6px;
+  border:1px solid var(--border);
+}
+.popup-problem-type { font-size:11px; font-weight:700; color:var(--text); margin-bottom:3px; }
+.popup-problem-desc { font-size:10.5px; color:var(--text2); line-height:1.4; margin-bottom:6px; }
+.popup-close {
+  position:absolute; top:10px; right:10px;
+  width:22px; height:22px; border-radius:50%;
+  background:var(--surface2); border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--text2);
+}
+.map-sidebar { display:flex; flex-direction:column; gap:16px; overflow-y:auto; }
+.map-legend-card { padding:16px; }
+.legend-title { font-size:12.5px; font-weight:700; color:var(--text); margin-bottom:12px; }
+.legend-item { display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:12px; color:var(--text2); }
+.legend-dot-box { width:12px; height:12px; border-radius:3px; }
+.map-click-hint {
+  text-align:center; padding:16px;
+  background:linear-gradient(135deg,var(--blue-light),var(--surface));
+  border:1.5px dashed var(--blue-mid); border-radius:var(--radius);
+  font-size:12px; color:var(--text2);
+}
+.map-click-hint i { font-size:24px; color:var(--blue); margin-bottom:8px; display:block; }
+.map-stats-mini { display:flex; flex-direction:column; gap:8px; }
+.map-stat-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 14px; background:var(--surface2);
+  border-radius:8px; border:1px solid var(--border);
+}
+.map-stat-label { font-size:12px; color:var(--text2); display:flex; align-items:center; gap:6px; }
+.map-stat-val { font-size:13px; font-weight:700; }
+/* Map zone labels */
+.map-label { font-size:10px; fill:#64748b; font-weight:600; pointer-events:none; font-family:'Plus Jakarta Sans',sans-serif; }
+/* Clickable zone highlight */
+.zone-highlight { fill:rgba(37,99,235,0.08); stroke:rgba(37,99,235,0.3); stroke-width:1.5; cursor:pointer; }
+.zone-highlight:hover { fill:rgba(37,99,235,0.15); }
+/* Pin markers */
+.pin-wrap {
+  position:absolute; transform:translate(-50%,-100%);
+  cursor:pointer; z-index:10;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  transition:transform 0.15s;
+}
+.pin-wrap:hover { transform:translate(-50%,-110%) scale(1.1); }
+.pin-svg { width:28px; height:34px; }
+
+/* ===== REPORT FORM ===== */
+.report-layout { display:grid; grid-template-columns:1fr 1fr; gap:24px; max-width:1000px; }
+.form-section { padding:24px; }
+.form-section-title {
+  font-size:14px; font-weight:700; color:var(--text);
+  margin-bottom:18px; display:flex; align-items:center; gap:8px;
+  padding-bottom:12px; border-bottom:1px solid var(--border);
+}
+.form-section-title i { color:var(--blue); }
+.form-group { margin-bottom:16px; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+.map-picker {
+  width:100%; height:200px; border-radius:var(--radius-sm);
+  border:1.5px dashed var(--border2);
+  overflow:hidden; position:relative; cursor:crosshair;
+  background:#f0ebe3;
+}
+.map-picker svg { width:100%; height:100%; }
+.picker-pin-marker {
+  position:absolute; transform:translate(-50%,-100%);
+  pointer-events:none; z-index:5;
+}
+.picker-pin-marker i { font-size:20px; color:var(--blue); filter:drop-shadow(0 2px 3px rgba(0,0,0,0.25)); }
+.picker-hint {
+  position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
+  background:rgba(0,0,0,0.6); color:white; font-size:10px;
+  padding:3px 10px; border-radius:10px; white-space:nowrap; pointer-events:none;
+}
+.selected-location-tag {
+  display:flex; align-items:center; gap:8px;
+  padding:9px 13px; background:var(--blue-light);
+  border:1.5px solid var(--blue-mid); border-radius:var(--radius-sm);
+  font-size:12.5px; color:var(--blue); font-weight:500;
+  margin-bottom:12px;
+}
+.selected-location-tag i { color:var(--blue); }
+.char-count { font-size:10.5px; color:var(--text3); text-align:right; margin-top:4px; }
+.submit-btn-wrap { margin-top:4px; }
+/* Success card */
+.success-card {
+  background:linear-gradient(135deg,#f0fdf4,#eff6ff);
+  border:1.5px solid var(--green-mid);
+  border-radius:var(--radius); padding:24px; text-align:center;
+}
+.success-icon {
+  width:56px; height:56px; border-radius:50%;
+  background:var(--green-light); border:2px solid var(--green-mid);
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 14px; font-size:24px; color:var(--green);
+}
+.success-title { font-size:17px; font-weight:800; color:var(--text); margin-bottom:6px; }
+.success-subtitle { font-size:13px; color:var(--text2); margin-bottom:18px; }
+.ticket-box {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-sm); padding:14px 18px;
+  text-align:left; margin-bottom:16px;
+}
+.ticket-row { display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px solid var(--border); }
+.ticket-row:last-child { border-bottom:none; }
+.ticket-key { font-size:11px; color:var(--text3); font-family:var(--mono); text-transform:uppercase; letter-spacing:0.6px; }
+.ticket-val { font-size:12.5px; font-weight:600; color:var(--text); }
+.ticket-id { color:var(--blue); font-family:var(--mono); font-size:14px; font-weight:700; }
+
+/* ===== VIEW PROBLEMS ===== */
+.problems-toolbar {
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:20px; flex-wrap:wrap;
+}
+.search-wrap { position:relative; flex:1; min-width:180px; max-width:320px; }
+.search-wrap input { padding-left:36px; }
+.search-wrap .search-icon { position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--text3); font-size:13px; }
+.filter-select-wrap { position:relative; }
+.filter-select-wrap select { padding-right:32px; min-width:150px; width:auto; }
+.problems-count { font-size:13px; color:var(--text3); margin-left:auto; font-weight:500; }
+.problems-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.problem-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-sm);
+  transition:all 0.2s;
+}
+.problem-card:hover { box-shadow:var(--shadow); transform:translateY(-2px); }
+.problem-card-top {
+  height:6px;
+}
+.problem-card-body { padding:16px; }
+.problem-card-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:10px; }
+.problem-type { font-size:13.5px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:7px; }
+.problem-type-emoji { font-size:16px; }
+.problem-desc { font-size:12.5px; color:var(--text2); line-height:1.55; margin-bottom:12px; }
+.problem-meta { display:flex; flex-direction:column; gap:7px; }
+.problem-meta-row { display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text3); }
+.problem-meta-row i { width:14px; color:var(--text3); font-size:11px; }
+.problem-meta-row .editable-input {
+  flex:1; padding:3px 7px; font-size:11.5px;
+  border-radius:5px; border:1px solid transparent; background:transparent;
+  font-family:var(--font); color:var(--text2);
+  width:auto;
+}
+.problem-meta-row .editable-input:hover { border-color:var(--border); background:var(--surface2); }
+.problem-meta-row .editable-input:focus { border-color:var(--blue); background:var(--blue-light); color:var(--blue); }
+.problem-actions { display:flex; gap:6px; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); }
+.status-select {
+  flex:1; padding:5px 8px; border-radius:6px;
+  font-size:11.5px; font-family:var(--font); font-weight:600;
+  border:1.5px solid; cursor:pointer; outline:none; width:auto;
+}
+.problem-card-id { font-family:var(--mono); font-size:10px; color:var(--text3); }
+.empty-state {
+  text-align:center; padding:60px 20px;
+  grid-column:1/-1;
+}
+.empty-icon { font-size:48px; margin-bottom:14px; opacity:0.3; }
+.empty-text { font-size:15px; color:var(--text3); }
+
+/* ===== AUTH PAGES ===== */
+.auth-wrapper {
+  min-height:calc(100vh - 60px);
+  display:flex; align-items:center; justify-content:center;
+  padding:28px;
+  background:linear-gradient(135deg,#f0f7ff 0%,#f0fdf4 50%,#fefce8 100%);
+}
+.auth-card {
+  background:var(--surface); border-radius:20px;
+  padding:36px 40px; width:100%; max-width:440px;
+  box-shadow:var(--shadow-lg); border:1px solid var(--border);
+  animation:fadeIn 0.35s ease;
+}
+.auth-logo { display:flex; align-items:center; gap:10px; margin-bottom:28px; justify-content:center; }
+.auth-logo-mark {
+  width:42px; height:42px; border-radius:12px;
+  background:linear-gradient(135deg,#2563eb,#3b82f6);
+  display:flex; align-items:center; justify-content:center; color:white; font-size:18px;
+  box-shadow:0 4px 12px rgba(37,99,235,0.3);
+}
+.auth-logo-text { font-size:17px; font-weight:800; color:var(--text); }
+.auth-logo-text span { color:var(--blue); }
+.auth-title { font-size:26px; font-weight:800; color:var(--text); margin-bottom:4px; }
+.auth-subtitle { font-size:13.5px; color:var(--text2); margin-bottom:26px; }
+.auth-submit {
+  width:100%; padding:12px;
+  background:linear-gradient(135deg,#2563eb,#3b82f6);
+  color:white; border:none; border-radius:10px;
+  font-family:var(--font); font-size:14.5px; font-weight:700;
+  cursor:pointer; transition:all 0.2s; margin-top:4px;
+}
+.auth-submit:hover { background:linear-gradient(135deg,#1d4ed8,#2563eb); transform:translateY(-1px); box-shadow:0 6px 16px rgba(37,99,235,0.35); }
+.auth-divider { display:flex; align-items:center; gap:12px; margin:18px 0; color:var(--text3); font-size:12px; }
+.auth-divider::before, .auth-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+.auth-footer { text-align:center; font-size:13px; color:var(--text2); margin-top:20px; }
+.auth-footer a { color:var(--blue); font-weight:600; cursor:pointer; text-decoration:none; }
+.auth-footer a:hover { text-decoration:underline; }
+.input-with-icon { position:relative; }
+.input-with-icon input { padding-left:38px; }
+.input-with-icon .input-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text3); font-size:13px; }
+.input-with-icon .input-icon-right {
+  position:absolute; right:12px; top:50%; transform:translateY(-50%);
+  color:var(--text3); font-size:13px; cursor:pointer;
+}
+.password-strength { height:3px; border-radius:3px; margin-top:6px; transition:all 0.3s; }
+.error-msg { font-size:11.5px; color:var(--red); margin-top:4px; display:flex; align-items:center; gap:4px; }
+.form-hint { font-size:11px; color:var(--text3); margin-top:4px; }
+
+/* ===== NOTIFICATION TOAST ===== */
+.toast-container { position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; flex-direction:column; gap:10px; }
+.toast {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:14px 18px;
+  box-shadow:var(--shadow-lg); min-width:280px; max-width:360px;
+  display:flex; align-items:flex-start; gap:12px;
+  animation:slideRight 0.3s ease;
+}
+.toast-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+.toast-body { flex:1; }
+.toast-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:2px; }
+.toast-msg { font-size:12px; color:var(--text2); }
+.toast-close { color:var(--text3); cursor:pointer; font-size:12px; background:none; border:none; padding:0; }
+
+/* Responsive */
+@media(max-width:900px) {
+  .stats-row { grid-template-columns:repeat(2,1fr); }
+  .map-layout { grid-template-columns:1fr; }
+  .report-layout { grid-template-columns:1fr; }
+  .problems-grid { grid-template-columns:repeat(2,1fr); }
+}
+@media(max-width:600px) {
+  .topbar { padding:0 14px; }
+  .page { padding:16px; }
+  .problems-grid { grid-template-columns:1fr; }
+  .hero-title { font-size:26px; }
+  .stats-row { grid-template-columns:1fr 1fr; }
+  .form-row { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ===================== INITIAL DATA =====================
+const MADURAI_ZONES = [
+  { id:'anna-nagar', name:'Anna Nagar', cx:220, cy:110, color:'#3b82f6' },
+  { id:'race-course', name:'Race Course', cx:540, cy:180, color:'#8b5cf6' },
+  { id:'meenakshi', name:'Meenakshi Nagar', cx:330, cy:320, color:'#f59e0b' },
+  { id:'tnagar', name:'T. Nagar', cx:480, cy:380, color:'#ec4899' },
+  { id:'south-madurai', name:'South Madurai', cx:250, cy:460, color:'#14b8a6' },
+  { id:'bypass', name:'Bypass Rd', cx:660, cy:320, color:'#ef4444' },
+  { id:'kappalur', name:'Kappalur', cx:700, cy:460, color:'#22c55e' },
+  { id:'palanganatham', name:'Palanganatham', cx:520, cy:500, color:'#f97316' },
+];
+
+const ZONE_NAMES = MADURAI_ZONES.map(z => z.name);
+
+const ISSUE_TYPES = [
+  { value:'pothole', label:'Pothole / Road Damage', emoji:'🕳️', color:'#ef4444' },
+  { value:'drainage', label:'Drainage / Waterlogging', emoji:'🚿', color:'#3b82f6' },
+  { value:'garbage', label:'Garbage Dumping', emoji:'🗑️', color:'#f59e0b' },
+  { value:'street-light', label:'Street Light Issue', emoji:'💡', color:'#8b5cf6' },
+  { value:'traffic', label:'Traffic Signal Fault', emoji:'🚦', color:'#ec4899' },
+  { value:'water-supply', label:'Water Supply Issue', emoji:'💧', color:'#06b6d4' },
+  { value:'other', label:'Other', emoji:'📋', color:'#64748b' },
+];
+
+const STATUS_OPTIONS = ['Pending','In Progress','Resolved'];
+
+const INITIAL_PROBLEMS = [
+  { id:'MDF-1001', type:'pothole', location:'Anna Nagar Main Rd, Madurai', zone:'anna-nagar', desc:'Large pothole near bus stop causing vehicle damage and accidents.', status:'Pending', date:'2025-03-15' },
+  { id:'MDF-1002', type:'drainage', location:'East Veli Street, Madurai', zone:'meenakshi', desc:'Recurring waterlogging due to blocked drain near Meenakshi Temple.', status:'In Progress', date:'2025-03-17' },
+  { id:'MDF-1003', type:'garbage', location:'Race Course Road, Madurai', zone:'race-course', desc:'Illegal garbage dump near park wall. Multiple bags piled for over a week.', status:'Resolved', date:'2025-03-10' },
+  { id:'MDF-1004', type:'street-light', location:'Bypass Road, Madurai', zone:'bypass', desc:'4 consecutive street lights non-functional creating dark stretch.', status:'Pending', date:'2025-03-18' },
+  { id:'MDF-1005', type:'traffic', location:'Mattuthavani Junction, Madurai', zone:'tnagar', desc:'Traffic signal completely non-functional causing major congestion.', status:'In Progress', date:'2025-03-16' },
+  { id:'MDF-1006', type:'water-supply', location:'South Madurai, Palanganatham', zone:'south-madurai', desc:'No water supply for 3 consecutive days in residential colony.', status:'Resolved', date:'2025-03-09' },
+];
+
+const TYPE_MAP = Object.fromEntries(ISSUE_TYPES.map(t => [t.value, t]));
+
+let nextId = 1007;
+function genId() { return `MDF-${nextId++}`; }
+
+// ===================== UTILS =====================
+function getStatusColor(status) {
+  if(status==='Pending') return { bg:'#fef2f2', border:'#fecaca', text:'#dc2626', dot:'dot-red', class:'badge-red' };
+  if(status==='In Progress') return { bg:'#fffbeb', border:'#fde68a', text:'#d97706', dot:'dot-yellow', class:'badge-yellow' };
+  return { bg:'#f0fdf4', border:'#bbf7d0', text:'#16a34a', dot:'dot-green', class:'badge-green' };
+}
+
+function formatDate(d) {
+  return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+// ===================== CLOCK =====================
+function Clock() {
+  const [time, setTime] = useState(new Date());
+  useEffect(() => {
+    const t = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div className="clock-display">
+      <i className="fas fa-clock"></i>
+      {time.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+      &nbsp;<span style={{fontSize:'11px',color:'var(--text3)'}}>
+        {time.toLocaleDateString('en-IN',{day:'2-digit',month:'short'})}
+      </span>
+    </div>
+  );
+}
+
+// ===================== TOAST =====================
+function ToastContainer({ toasts, removeToast }) {
+  return (
+    <div className="toast-container">
+      {toasts.map(t => (
+        <div key={t.id} className="toast">
+          <div className="toast-icon" style={{background:t.bg||'var(--blue-light)',color:t.color||'var(--blue)'}}>
+            <i className={t.icon||'fas fa-info-circle'}></i>
+          </div>
+          <div className="toast-body">
+            <div className="toast-title">{t.title}</div>
+            <div className="toast-msg">{t.msg}</div>
+          </div>
+          <button className="toast-close" onClick={()=>removeToast(t.id)}>✕</button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ===================== MADURAI MAP SVG =====================
+function MaduraiMapSVG({ onZoneClick, problems, mini }) {
+  const svgRef = useRef(null);
+  const scale = mini ? 0.42 : 1;
+
+  const zoneProblems = (zoneId) => problems.filter(p=>p.zone===zoneId);
+
+  return (
+    <svg ref={svgRef} viewBox="0 0 900 580" xmlns="http://www.w3.org/2000/svg"
+      style={{width:'100%',height:'100%',cursor:'crosshair'}}>
+      {/* Background */}
+      <rect width="900" height="580" fill="#f0ebe3"/>
+      {/* Vaigai River */}
+      <path d="M0 280 Q80 265 180 278 Q280 292 380 285 Q480 277 560 290 Q640 303 730 297 Q820 290 900 300"
+        stroke="#a8d8ea" strokeWidth="26" fill="none" opacity="0.85"/>
+      <path d="M0 280 Q80 265 180 278 Q280 292 380 285 Q480 277 560 290 Q640 303 730 297 Q820 290 900 300"
+        stroke="#c5eaf7" strokeWidth="14" fill="none" opacity="0.6"/>
+      <text x="300" y="267" className="map-label" style={{fontSize:10,fill:'#5ba4c4',fontWeight:700,letterSpacing:3}}>VAIGAI RIVER</text>
+
+      {/* Urban blocks — north */}
+      {[[40,50,80,55],[135,60,75,45],[225,48,95,62],[340,55,80,50],[440,50,105,60],[565,58,80,48],[665,52,95,58],[780,55,80,52],[880,48,18,62]].map(([x,y,w,h],i)=>(
+        <rect key={i} x={x} y={y} width={w} height={h} rx="3" fill="#e8e2d9" stroke="#d8d2c0" strokeWidth="0.5"/>
+      ))}
+      {[[40,125,70,50],[125,130,90,45],[230,128,60,48],[310,122,110,55],[445,128,85,50],[550,125,100,55],[670,130,80,48],[775,122,95,55],[890,128,8,50]].map(([x,y,w,h],i)=>(
+        <rect key={i} x={x} y={y} width={w} height={h} rx="3" fill="#eae4db" stroke="#d8d2c0" strokeWidth="0.5"/>
+      ))}
+      {[[40,198,80,52],[140,202,65,48],[225,195,80,55],[325,202,70,48],[420,196,85,55],[525,202,95,48],[640,196,80,55],[745,202,75,48],[850,196,48,55]].map(([x,y,w,h],i)=>(
+        <rect key={i} x={x} y={y} width={w} height={h} rx="3" fill="#e8e2d9" stroke="#d8d2c0" strokeWidth="0.5"/>
+      ))}
+
+      {/* Meenakshi Temple complex */}
+      <rect x="270" y="300" width="135" height="105" rx="5" fill="#e2d8cc" stroke="#c0a87a" strokeWidth="1.5"/>
+      <rect x="278" y="308" width="119" height="89" rx="3" fill="#ede5d8" stroke="#c0a87a" strokeWidth="0.8"/>
+      <rect x="330" y="300" width="11" height="20" rx="2" fill="#c8a040"/>
+      <rect x="330" y="396" width="11" height="15" rx="2" fill="#c8a040"/>
+      <rect x="270" y="345" width="14" height="11" rx="2" fill="#c8a040"/>
+      <rect x="391" y="345" width="14" height="11" rx="2" fill="#c8a040"/>
+      <circle cx="336" cy="350" r="8" fill="#d4a843" opacity="0.5"/>
+      <text x="337" y="353" textAnchor="middle" fill="#8a6030" fontSize="6.5" fontWeight="700" fontFamily="'Plus Jakarta Sans',sans-serif">✦</text>
+      <text x="337" y="365" textAnchor="middle" fill="#8a6030" fontSize="7" fontWeight="700" fontFamily="'Plus Jakarta Sans',sans-serif">MEENAKSHI</text>
+      <text x="337" y="374" textAnchor="middle" fill="#8a6030" fontSize="6.5" fontWeight="600" fontFamily="'Plus Jakarta Sans',sans-serif">AMMAN TEMPLE</text>
+
+      {/* South of river blocks */}
+      {[[40,320,85,52],[150,325,70,48],[420,318,85,55],[525,325,95,50],[640,318,90,55],[755,325,80,48],[860,318,38,55]].map(([x,y,w,h],i)=>(
+        <rect key={i} x={x} y={y} width={w} height={h} rx="3" fill="#e8e2d9" stroke="#d8d2c0" strokeWidth="0.5"/>
+      ))}
+      {[[40,392,100,55],[160,398,75,48],[250,392,90,55],[360,398,80,48],[460,392,95,55],[575,398,80,48],[680,392,95,55],[800,398,90,48]].map(([x,y,w,h],i)=>(
+        <rect key={i} x={x} y={y} width={w} height={h} rx="3" fill="#eae4db" stroke="#d8d2c0" strokeWidth="0.5"/>
+      ))}
+      {[[40,462,105,55],[160,468,80,52],[260,462,85,55],[365,468,85,48],[465,462,100,55],[578,468,78,52],[672,462,100,55],[790,468,85,52],[892,462,6,55]].map(([x,y,w,h],i)=>(
+        <rect key={i} x={x} y={y} width={w} height={h} rx="3" fill="#e8e2d9" stroke="#d8d2c0" strokeWidth="0.5"/>
+      ))}
+
+      {/* Green park */}
+      <rect x="640" y="325" width="70" height="45" rx="4" fill="#c8e8c4" stroke="#a8d8a0" strokeWidth="0.8"/>
+      <text x="675" y="352" textAnchor="middle" fill="#4a8a4a" fontSize="7" fontWeight="700" fontFamily="'Plus Jakarta Sans',sans-serif">Gandhi Park</text>
+
+      {/* Main Roads */}
+      <rect x="0" y="116" width="900" height="11" fill="#f5f0e6" stroke="#d8cfc0" strokeWidth="0.5"/>
+      <text x="80" y="113" className="map-label" fontSize="8" fill="#9a8a6a">Anna Nagar Main Rd</text>
+      <rect x="0" y="192" width="900" height="11" fill="#f5f0e6" stroke="#d8cfc0" strokeWidth="0.5"/>
+      <text x="620" y="190" className="map-label" fontSize="8" fill="#9a8a6a">Race Course Rd</text>
+      <rect x="0" y="296" width="900" height="8" fill="#f0ebe0" stroke="#d0c8b0" strokeWidth="0.5"/>
+      <text x="430" y="293" className="map-label" fontSize="7.5" fill="#8a7a5a">East Veli St</text>
+      <rect x="0" y="412" width="900" height="8" fill="#f0ebe0" stroke="#d0c8b0" strokeWidth="0.5"/>
+      <text x="430" y="410" className="map-label" fontSize="7.5" fill="#8a7a5a">West Veli St</text>
+      <rect x="138" y="0" width="11" height="580" fill="#f5f0e6" stroke="#d8cfc0" strokeWidth="0.5"/>
+      <rect x="435" y="0" width="11" height="580" fill="#f5f0e6" stroke="#d8cfc0" strokeWidth="0.5"/>
+      <rect x="638" y="0" width="11" height="580" fill="#f5f0e6" stroke="#d8cfc0" strokeWidth="0.5"/>
+      <rect x="860" y="0" width="11" height="580" fill="#f5f0e6" stroke="#d8cfc0" strokeWidth="0.5"/>
+      {/* Minor roads */}
+      {[52,180,256,388,448,520].map((y,i)=>(
+        <line key={i} x1="0" y1={y} x2="900" y2={y} stroke="#ece6da" strokeWidth="3"/>
+      ))}
+      {[230,320,550,730].map((x,i)=>(
+        <line key={i} x1={x} y1="0" x2={x} y2="580" stroke="#ece6da" strokeWidth="3"/>
+      ))}
+
+      {/* Clickable Zones */}
+      {MADURAI_ZONES.map(zone => {
+        const zp = zoneProblems(zone.id);
+        const hasProblems = zp.length > 0;
+        return (
+          <g key={zone.id} onClick={() => onZoneClick && onZoneClick(zone, zp)}>
+            <circle
+              cx={zone.cx} cy={zone.cy} r="34"
+              fill={hasProblems ? `${zone.color}18` : 'rgba(0,0,0,0.03)'}
+              stroke={hasProblems ? zone.color : '#d0cfc0'}
+              strokeWidth={hasProblems ? 1.8 : 1}
+              strokeDasharray={hasProblems ? 'none' : '4,3'}
+              style={{cursor:'pointer',transition:'all 0.2s'}}
+              className="map-zone"
+            />
+            {hasProblems && (
+              <circle cx={zone.cx+22} cy={zone.cy-22} r="11" fill="white" stroke={zone.color} strokeWidth="1.5"/>
+            )}
+            {hasProblems && (
+              <text x={zone.cx+22} y={zone.cy-18} textAnchor="middle" fill={zone.color} fontSize="9" fontWeight="800" fontFamily="'Plus Jakarta Sans',sans-serif">{zp.length}</text>
+            )}
+            <text x={zone.cx} y={zone.cy+3} textAnchor="middle" fill={hasProblems?zone.color:'#6b7280'} fontSize="8" fontWeight="700" fontFamily="'Plus Jakarta Sans',sans-serif">{zone.name.split(' ')[0]}</text>
+            <text x={zone.cx} y={zone.cy+13} textAnchor="middle" fill={hasProblems?zone.color:'#9ca3af'} fontSize="7" fontFamily="'Plus Jakarta Sans',sans-serif">{zone.name.split(' ').slice(1).join(' ')}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+// ===================== MAP POPUP =====================
+function MapZonePopup({ zone, problems, onClose }) {
+  if(!zone) return null;
+  return (
+    <div style={{position:'absolute',top:20,right:20,zIndex:30}} className="pop-in">
+      <div className="map-popup-box" style={{width:260}}>
+        <button className="popup-close" onClick={onClose} style={{position:'absolute',top:10,right:10}}>✕</button>
+        <div className="popup-header">
+          <div className="popup-icon" style={{background:`${zone.color}18`,color:zone.color}}>
+            <i className="fas fa-map-marker-alt"></i>
+          </div>
+          <div>
+            <div className="popup-title">{zone.name}</div>
+            <div className="popup-loc">{problems.length} problem{problems.length!==1?'s':''} reported</div>
+          </div>
+        </div>
+        {problems.length === 0 ? (
+          <div style={{textAlign:'center',padding:'16px 0',color:'var(--text3)',fontSize:12}}>
+            <i className="fas fa-check-circle" style={{fontSize:22,color:'var(--green)',marginBottom:6,display:'block'}}></i>
+            No problems reported here
+          </div>
+        ) : (
+          <div className="popup-problems">
+            {problems.map(p => {
+              const t = TYPE_MAP[p.type];
+              const sc = getStatusColor(p.status);
+              return (
+                <div key={p.id} className="popup-problem-item">
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:4}}>
+                    <div className="popup-problem-type">{t?.emoji} {t?.label||p.type}</div>
+                    <span className={`badge ${sc.class}`} style={{fontSize:9,padding:'1px 7px'}}>
+                      <div className={`badge-dot ${sc.dot}`}></div>{p.status}
+                    </span>
+                  </div>
+                  <div className="popup-problem-desc">{p.desc}</div>
+                  <div style={{fontSize:10,color:'var(--text3)',fontFamily:'var(--mono)'}}>{p.id} · {formatDate(p.date)}</div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ===================== HOME PAGE =====================
+function HomePage({ problems, setPage }) {
+  const total = problems.length;
+  const pending = problems.filter(p=>p.status==='Pending').length;
+  const inProgress = problems.filter(p=>p.status==='In Progress').length;
+  const resolved = problems.filter(p=>p.status==='Resolved').length;
+
+  return (
+    <div className="page fade-in">
+      {/* Hero */}
+      <div className="home-hero">
+        <div className="hero-badge">
+          <div className="hero-badge-dot"></div>
+          Madurai Corporation · Live Platform
+        </div>
+        <h1 className="hero-title">
+          Madurai <span>Problem</span><br/>Finder Platform
+        </h1>
+        <p className="hero-desc">
+          Report city infrastructure issues — potholes, drainage, garbage, street lights and more.
+          Help build a cleaner, smarter Madurai for everyone.
+        </p>
+        <div className="hero-actions">
+          <button className="btn btn-primary" onClick={() => setPage('report')}>
+            <i className="fas fa-plus-circle"></i> Report an Issue
+          </button>
+          <button className="btn btn-secondary" onClick={() => setPage('problems')}>
+            <i className="fas fa-list"></i> View All Problems
+          </button>
+          <button className="btn btn-secondary" onClick={() => setPage('map')}>
+            <i className="fas fa-map-marked-alt"></i> Explore Map
+          </button>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="stats-row">
+        <div className="stat-card">
+          <div className="stat-card-accent" style={{background:'linear-gradient(90deg,#3b82f6,#60a5fa)'}}></div>
+          <div className="stat-icon-wrap" style={{background:'#eff6ff',color:'#3b82f6'}}><i className="fas fa-database"></i></div>
+          <div className="stat-num" style={{color:'#3b82f6'}}>{total}</div>
+          <div className="stat-label">Total Reports</div>
+          <div className="stat-sub" style={{color:'var(--text3)'}}>All time · Madurai</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-card-accent" style={{background:'linear-gradient(90deg,#ef4444,#f87171)'}}></div>
+          <div className="stat-icon-wrap" style={{background:'#fef2f2',color:'#ef4444'}}><i className="fas fa-exclamation-circle"></i></div>
+          <div className="stat-num" style={{color:'#ef4444'}}>{pending}</div>
+          <div className="stat-label">Pending Issues</div>
+          <div className="stat-sub" style={{color:'var(--red)'}}>Requires attention</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-card-accent" style={{background:'linear-gradient(90deg,#f59e0b,#fbbf24)'}}></div>
+          <div className="stat-icon-wrap" style={{background:'#fffbeb',color:'#f59e0b'}}><i className="fas fa-tools"></i></div>
+          <div className="stat-num" style={{color:'#f59e0b'}}>{inProgress}</div>
+          <div className="stat-label">In Progress</div>
+          <div className="stat-sub" style={{color:'var(--yellow)'}}>Being addressed</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-card-accent" style={{background:'linear-gradient(90deg,#16a34a,#22c55e)'}}></div>
+          <div className="stat-icon-wrap" style={{background:'#f0fdf4',color:'#16a34a'}}><i className="fas fa-check-circle"></i></div>
+          <div className="stat-num" style={{color:'#16a34a'}}>{resolved}</div>
+          <div className="stat-label">Resolved</div>
+          <div className="stat-sub" style={{color:'var(--green)'}}>Successfully fixed</div>
+        </div>
+      </div>
+
+      {/* Recent */}
+      <div style={{marginBottom:8,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+        <div style={{fontWeight:700,fontSize:16}}>Recent Reports</div>
+        <button className="btn btn-secondary btn-sm" onClick={()=>setPage('problems')}>View All <i className="fas fa-arrow-right"></i></button>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12}}>
+        {problems.slice(-3).reverse().map(p => {
+          const t = TYPE_MAP[p.type];
+          const sc = getStatusColor(p.status);
+          return (
+            <div key={p.id} className="card" style={{padding:'14px 16px',display:'flex',gap:12,alignItems:'flex-start'}}>
+              <div style={{fontSize:22,lineHeight:1,marginTop:2}}>{t?.emoji}</div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontWeight:700,fontSize:13,marginBottom:3}}>{t?.label||p.type}</div>
+                <div style={{fontSize:11.5,color:'var(--text2)',marginBottom:6,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}><i className="fas fa-map-marker-alt" style={{marginRight:4,color:'var(--text3)'}}></i>{p.location}</div>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                  <span className={`badge ${sc.class}`} style={{fontSize:10}}>
+                    <div className={`badge-dot ${sc.dot}`}></div>{p.status}
+                  </span>
+                  <span style={{fontFamily:'var(--mono)',fontSize:10,color:'var(--text3)'}}>{p.id}</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ===================== MAP PAGE =====================
+function MapPage({ problems }) {
+  const [activeZone, setActiveZone] = useState(null);
+  const [activeProblems, setActiveProblems] = useState([]);
+
+  const handleZoneClick = (zone, zoneProblems) => {
+    setActiveZone(zone);
+    setActiveProblems(zoneProblems);
+  };
+
+  const handleClosePopup = () => { setActiveZone(null); setActiveProblems([]); };
+
+  const pending = problems.filter(p=>p.status==='Pending').length;
+  const inProg = problems.filter(p=>p.status==='In Progress').length;
+  const resolved = problems.filter(p=>p.status==='Resolved').length;
+
+  return (
+    <div className="page fade-in" style={{height:'calc(100vh-60px)',padding:'20px 28px'}}>
+      <div style={{marginBottom:16,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+        <div>
+          <div className="page-title" style={{marginBottom:2}}>Madurai City Map</div>
+          <div className="page-subtitle">Click on any zone circle to view reported problems</div>
+        </div>
+      </div>
+      <div className="map-layout" style={{height:'calc(100vh - 190px)'}}>
+        <div className="map-wrap" style={{position:'relative'}}>
+          <MaduraiMapSVG onZoneClick={handleZoneClick} problems={problems} />
+          {activeZone && (
+            <MapZonePopup zone={activeZone} problems={activeProblems} onClose={handleClosePopup} />
+          )}
+          {!activeZone && (
+            <div style={{position:'absolute',bottom:14,left:'50%',transform:'translateX(-50%)',
+              background:'rgba(0,0,0,0.55)',color:'white',fontSize:11,padding:'5px 14px',
+              borderRadius:20,pointerEvents:'none',whiteSpace:'nowrap'}}>
+              🖱️ Click a zone circle to see reported problems
+            </div>
+          )}
+        </div>
+        <div className="map-sidebar">
+          <div className="card map-legend-card">
+            <div className="legend-title">Zone Key</div>
+            {MADURAI_ZONES.map(z => {
+              const cnt = problems.filter(p=>p.zone===z.id).length;
+              return (
+                <div key={z.id} className="legend-item" style={{justifyContent:'space-between'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:7}}>
+                    <div className="legend-dot-box" style={{background:z.color+'30',border:`2px solid ${z.color}`,borderRadius:'50%',width:12,height:12}}></div>
+                    {z.name}
+                  </div>
+                  {cnt > 0 && <span className="badge badge-red" style={{fontSize:9,padding:'1px 7px'}}>{cnt}</span>}
+                </div>
+              );
+            })}
+          </div>
+          <div className="card" style={{padding:16}}>
+            <div className="legend-title">City Overview</div>
+            <div className="map-stats-mini">
+              <div className="map-stat-row">
+                <span className="map-stat-label"><div className="badge-dot dot-red" style={{width:8,height:8}}></div>Pending</span>
+                <span className="map-stat-val" style={{color:'var(--red)'}}>{pending}</span>
+              </div>
+              <div className="map-stat-row">
+                <span className="map-stat-label"><div className="badge-dot dot-yellow" style={{width:8,height:8}}></div>In Progress</span>
+                <span className="map-stat-val" style={{color:'var(--yellow)'}}>{inProg}</span>
+              </div>
+              <div className="map-stat-row">
+                <span className="map-stat-label"><div className="badge-dot dot-green" style={{width:8,height:8}}></div>Resolved</span>
+                <span className="map-stat-val" style={{color:'var(--green)'}}>{resolved}</span>
+              </div>
+            </div>
+          </div>
+          <div className="card map-click-hint">
+            <i className="fas fa-hand-pointer"></i>
+            <div style={{fontWeight:600,marginBottom:4,fontSize:13}}>Interactive Map</div>
+            <div>Click on any coloured zone circle to see all problems reported in that area of Madurai.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ===================== REPORT PAGE =====================
+function ReportPage({ addProblem, setPage }) {
+  const [form, setForm] = useState({ type:'', zone:'', location:'', desc:'', priority:'Medium' });
+  const [pinPos, setPinPos] = useState(null);
+  const [submitted, setSubmitted] = useState(null);
+  const [errors, setErrors] = useState({});
+  const mapRef = useRef(null);
+
+  const handleMapClick = (e) => {
+    const rect = mapRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+    const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+    setPinPos({x,y});
+    // Determine zone from click
+    const nx = (e.clientX - rect.left) / rect.width * 900;
+    const ny = (e.clientY - rect.top) / rect.height * 580;
+    let closest = null, minD = Infinity;
+    MADURAI_ZONES.forEach(z => {
+      const d = Math.hypot(z.cx - nx, z.cy - ny);
+      if(d < minD) { minD = d; closest = z; }
+    });
+    if(closest) {
+      setForm(f => ({...f, zone:closest.id, location:`${closest.name}, Madurai`}));
+    }
+  };
+
+  const validate = () => {
+    const e = {};
+    if(!form.type) e.type = 'Please select a problem type';
+    if(!form.zone) e.zone = 'Please pick a location on the map';
+    if(!form.desc || form.desc.length < 15) e.desc = 'Description must be at least 15 characters';
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const handleSubmit = () => {
+    if(!validate()) return;
+    const newP = {
+      id: genId(),
+      type: form.type,
+      zone: form.zone,
+      location: form.location,
+      desc: form.desc,
+      status: 'Pending',
+      date: new Date().toISOString().split('T')[0],
+    };
+    addProblem(newP);
+    setSubmitted(newP);
+  };
+
+  const handleReset = () => {
+    setForm({type:'',zone:'',location:'',desc:'',priority:'Medium'});
+    setPinPos(null);
+    setErrors({});
+    setSubmitted(null);
+  };
+
+  if(submitted) {
+    const t = TYPE_MAP[submitted.type];
+    const sc = getStatusColor(submitted.status);
+    return (
+      <div className="page fade-in" style={{maxWidth:600,margin:'40px auto'}}>
+        <div className="success-card pop-in">
+          <div className="success-icon"><i className="fas fa-check"></i></div>
+          <div className="success-title">Problem Report Submitted!</div>
+          <div className="success-subtitle">
+            Your report has been received and added to the system. Madurai Corporation will review it shortly.
+          </div>
+          <div className="ticket-box">
+            <div className="ticket-row">
+              <span className="ticket-key">Ticket ID</span>
+              <span className="ticket-id">{submitted.id}</span>
+            </div>
+            <div className="ticket-row">
+              <span className="ticket-key">Category</span>
+              <span className="ticket-val">{t?.emoji} {t?.label}</span>
+            </div>
+            <div className="ticket-row">
+              <span className="ticket-key">Location</span>
+              <span className="ticket-val" style={{textAlign:'right',maxWidth:200}}>{submitted.location}</span>
+            </div>
+            <div className="ticket-row">
+              <span className="ticket-key">Submitted</span>
+              <span className="ticket-val">{formatDate(submitted.date)}</span>
+            </div>
+            <div className="ticket-row">
+              <span className="ticket-key">Status</span>
+              <span className={`badge ${sc.class}`} style={{fontSize:11}}>
+                <div className={`badge-dot ${sc.dot}`}></div>{submitted.status}
+              </span>
+            </div>
+          </div>
+          <div style={{display:'flex',gap:10,justifyContent:'center'}}>
+            <button className="btn btn-primary" onClick={()=>setPage('problems')}>
+              <i className="fas fa-list"></i> View in Problems List
+            </button>
+            <button className="btn btn-secondary" onClick={handleReset}>
+              <i className="fas fa-plus"></i> Report Another
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="page fade-in">
+      <div className="page-header">
+        <div className="page-title">Report a Problem</div>
+        <div className="page-subtitle">Help improve Madurai by reporting infrastructure issues</div>
+      </div>
+      <div className="report-layout">
+        {/* Form */}
+        <div className="card form-section">
+          <div className="form-section-title"><i className="fas fa-file-alt"></i> Problem Details</div>
+          
+          <div className="form-group">
+            <label>Problem Type *</label>
+            <select value={form.type} onChange={e=>setForm(f=>({...f,type:e.target.value}))} style={{borderColor:errors.type?'var(--red)':''}}>
+              <option value="">— Select problem type —</option>
+              {ISSUE_TYPES.map(t=>(
+                <option key={t.value} value={t.value}>{t.emoji} {t.label}</option>
+              ))}
+            </select>
+            {errors.type && <div className="error-msg"><i className="fas fa-exclamation-circle"></i>{errors.type}</div>}
+          </div>
+
+          <div className="form-group">
+            <label>Pick Location on Madurai Map *</label>
+            {form.zone && (
+              <div className="selected-location-tag">
+                <i className="fas fa-map-marker-alt"></i>
+                <span style={{flex:1}}>{form.location}</span>
+                <button onClick={()=>{setForm(f=>({...f,zone:'',location:''}));setPinPos(null);}} style={{background:'none',border:'none',cursor:'pointer',color:'var(--blue)',fontSize:12}}>✕</button>
+              </div>
+            )}
+            <div className="map-picker" ref={mapRef} onClick={handleMapClick} style={{borderColor:errors.zone?'var(--red)':''}}>
+              <svg viewBox="0 0 900 580" xmlns="http://www.w3.org/2000/svg" style={{width:'100%',height:'100%'}}>
+                <rect width="900" height="580" fill="#f0ebe3"/>
+                <path d="M0 280 Q200 265 400 280 Q600 295 900 285" stroke="#a8d8ea" strokeWidth="20" fill="none" opacity="0.8"/>
+                <text x="350" y="270" fontSize="9" fill="#5ba4c4" fontWeight="600" fontFamily="sans-serif" letterSpacing="3">VAIGAI RIVER</text>
+                <rect x="0" y="116" width="900" height="8" fill="#f5f0e6" stroke="#d8cfc0" strokeWidth="0.5"/>
+                <rect x="0" y="192" width="900" height="8" fill="#f5f0e6" stroke="#d8cfc0" strokeWidth="0.5"/>
+                <rect x="138" y="0" width="8" height="580" fill="#f5f0e6" stroke="#d8cfc0" strokeWidth="0.5"/>
+                <rect x="435" y="0" width="8" height="580" fill="#f5f0e6" stroke="#d8cfc0" strokeWidth="0.5"/>
+                <rect x="638" y="0" width="8" height="580" fill="#f5f0e6" stroke="#d8cfc0" strokeWidth="0.5"/>
+                <rect x="270" y="300" width="130" height="100" rx="4" fill="#e2d8cc" stroke="#c0a87a" strokeWidth="1.5"/>
+                <text x="335" y="357" textAnchor="middle" fill="#8a6030" fontSize="8" fontWeight="700" fontFamily="sans-serif">MEENAKSHI</text>
+                <text x="335" y="368" textAnchor="middle" fill="#8a6030" fontSize="7" fontFamily="sans-serif">TEMPLE</text>
+                {MADURAI_ZONES.map(z => (
+                  <g key={z.id}>
+                    <circle cx={z.cx} cy={z.cy} r="32" fill={`${z.color}15`} stroke={z.color} strokeWidth="1.5" style={{cursor:'pointer'}}/>
+                    <text x={z.cx} y={z.cy+3} textAnchor="middle" fill={z.color} fontSize="7.5" fontWeight="700" fontFamily="sans-serif">{z.name.split(' ')[0]}</text>
+                    <text x={z.cx} y={z.cy+12} textAnchor="middle" fill={z.color} fontSize="6.5" fontFamily="sans-serif">{z.name.split(' ').slice(1).join(' ')}</text>
+                  </g>
+                ))}
+              </svg>
+              {pinPos && (
+                <div className="picker-pin-marker" style={{left:`${pinPos.x}%`,top:`${pinPos.y}%`}}>
+                  <i className="fas fa-map-marker-alt" style={{fontSize:22,color:'var(--blue)',filter:'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'}}></i>
+                </div>
+              )}
+              {!pinPos && <div className="picker-hint">Click to select your location on the map</div>}
+            </div>
+            {errors.zone && <div className="error-msg"><i className="fas fa-exclamation-circle"></i>{errors.zone}</div>}
+          </div>
+
+          <div className="form-group">
+            <label>Fine-tune Address</label>
+            <input
+              value={form.location}
+              onChange={e=>setForm(f=>({...f,location:e.target.value}))}
+              placeholder="e.g. 12, East Veli Street, Madurai - 625001"
+            />
+            <div className="form-hint">Ensure address includes 'Madurai' for accuracy</div>
+          </div>
+
+          <div className="form-group">
+            <label>Description *</label>
+            <textarea
+              rows={4}
+              value={form.desc}
+              onChange={e=>setForm(f=>({...f,desc:e.target.value}))}
+              placeholder="Describe the problem in detail — severity, how long it has existed, who it affects..."
+              style={{borderColor:errors.desc?'var(--red)':''}}
+            />
+            <div className="char-count">{form.desc.length} / 500</div>
+            {errors.desc && <div className="error-msg"><i className="fas fa-exclamation-circle"></i>{errors.desc}</div>}
+          </div>
+
+          <div className="submit-btn-wrap">
+            <button className="btn btn-primary" style={{width:'100%',justifyContent:'center',padding:'13px'}} onClick={handleSubmit}>
+              <i className="fas fa-paper-plane"></i> Submit Report
+            </button>
+          </div>
+        </div>
+
+        {/* Right panel */}
+        <div style={{display:'flex',flexDirection:'column',gap:16}}>
+          <div className="card form-section">
+            <div className="form-section-title"><i className="fas fa-lightbulb"></i> Reporting Tips</div>
+            {[
+              ['fas fa-camera','Take a clear photo of the issue if possible'],
+              ['fas fa-map-pin','Click the map to auto-detect the nearest zone'],
+              ['fas fa-file-alt','Be specific — mention landmarks nearby'],
+              ['fas fa-clock','Reports are reviewed within 24-48 hours'],
+            ].map(([icon,text],i)=>(
+              <div key={i} style={{display:'flex',gap:10,alignItems:'flex-start',marginBottom:12}}>
+                <div style={{width:28,height:28,borderRadius:7,background:'var(--blue-light)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                  <i className={icon} style={{color:'var(--blue)',fontSize:12}}></i>
+                </div>
+                <span style={{fontSize:13,color:'var(--text2)',lineHeight:1.5}}>{text}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="card form-section">
+            <div className="form-section-title"><i className="fas fa-th"></i> Problem Categories</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+              {ISSUE_TYPES.map(t=>(
+                <div key={t.value}
+                  onClick={()=>setForm(f=>({...f,type:t.value}))}
+                  style={{
+                    display:'flex',alignItems:'center',gap:7,padding:'8px 10px',
+                    borderRadius:8,cursor:'pointer',border:'1.5px solid',
+                    borderColor:form.type===t.value?t.color:'var(--border)',
+                    background:form.type===t.value?`${t.color}10`:'var(--surface2)',
+                    transition:'all 0.15s',
+                  }}>
+                  <span style={{fontSize:16}}>{t.emoji}</span>
+                  <span style={{fontSize:11,fontWeight:form.type===t.value?700:500,color:form.type===t.value?t.color:'var(--text2)'}}>{t.label.split(' ')[0]}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ===================== VIEW PROBLEMS PAGE =====================
+function ProblemsPage({ problems, updateProblem }) {
+  const [search, setSearch] = useState('');
+  const [filterType, setFilterType] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [filterZone, setFilterZone] = useState('');
+
+  const filtered = problems.filter(p => {
+    const q = search.toLowerCase();
+    const matchSearch = !q || p.location.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q) || p.id.toLowerCase().includes(q) || (TYPE_MAP[p.type]?.label||'').toLowerCase().includes(q);
+    const matchType = !filterType || p.type === filterType;
+    const matchStatus = !filterStatus || p.status === filterStatus;
+    const matchZone = !filterZone || p.zone === filterZone;
+    return matchSearch && matchType && matchStatus && matchZone;
+  });
+
+  const updateStatus = (id, status) => updateProblem(id, { status });
+  const updateLocation = (id, location) => updateProblem(id, { location });
+
+  return (
+    <div className="page fade-in">
+      <div style={{marginBottom:20,display:'flex',alignItems:'flex-start',justifyContent:'space-between',flexWrap:'wrap',gap:12}}>
+        <div>
+          <div className="page-title">Reported Problems</div>
+          <div className="page-subtitle">All city issues reported in Madurai — editable status & address</div>
+        </div>
+      </div>
+
+      {/* Toolbar */}
+      <div className="problems-toolbar">
+        <div className="search-wrap">
+          <i className="fas fa-search search-icon"></i>
+          <input placeholder="Search problems, locations, IDs..." value={search} onChange={e=>setSearch(e.target.value)}/>
+        </div>
+        <div className="filter-select-wrap">
+          <select value={filterType} onChange={e=>setFilterType(e.target.value)}>
+            <option value="">All Types</option>
+            {ISSUE_TYPES.map(t=><option key={t.value} value={t.value}>{t.emoji} {t.label}</option>)}
+          </select>
+        </div>
+        <div className="filter-select-wrap">
+          <select value={filterStatus} onChange={e=>setFilterStatus(e.target.value)}>
+            <option value="">All Status</option>
+            {STATUS_OPTIONS.map(s=><option key={s} value={s}>{s}</option>)}
+          </select>
+        </div>
+        <div className="filter-select-wrap">
+          <select value={filterZone} onChange={e=>setFilterZone(e.target.value)}>
+            <option value="">All Zones</option>
+            {MADURAI_ZONES.map(z=><option key={z.id} value={z.id}>{z.name}</option>)}
+          </select>
+        </div>
+        {(search||filterType||filterStatus||filterZone) && (
+          <button className="btn btn-secondary btn-sm" onClick={()=>{setSearch('');setFilterType('');setFilterStatus('');setFilterZone('');}}>
+            <i className="fas fa-times"></i> Clear
+          </button>
+        )}
+        <div className="problems-count">{filtered.length} of {problems.length} problems</div>
+      </div>
+
+      <div className="problems-grid">
+        {filtered.length === 0 && (
+          <div className="empty-state">
+            <div className="empty-icon">🔍</div>
+            <div className="empty-text">No problems match your filters</div>
+          </div>
+        )}
+        {filtered.map(p => {
+          const t = TYPE_MAP[p.type];
+          const sc = getStatusColor(p.status);
+          return (
+            <div key={p.id} className="problem-card">
+              <div className="problem-card-top" style={{background:t?.color||'#94a3b8'}}></div>
+              <div className="problem-card-body">
+                <div className="problem-card-header">
+                  <div className="problem-type">
+                    <span className="problem-type-emoji">{t?.emoji||'📋'}</span>
+                    {t?.label||p.type}
+                  </div>
+                  <span style={{fontFamily:'var(--mono)',fontSize:10,color:'var(--text3)',flexShrink:0}}>{p.id}</span>
+                </div>
+                <div className="problem-desc">{p.desc}</div>
+                <div className="problem-meta">
+                  <div className="problem-meta-row">
+                    <i className="fas fa-map-marker-alt"></i>
+                    <input
+                      className="editable-input"
+                      defaultValue={p.location}
+                      onBlur={e=>updateLocation(p.id, e.target.value)}
+                      title="Click to edit address"
+                    />
+                  </div>
+                  <div className="problem-meta-row">
+                    <i className="fas fa-calendar"></i>
+                    <span>{formatDate(p.date)}</span>
+                  </div>
+                </div>
+                <div className="problem-actions">
+                  <select
+                    className="status-select"
+                    value={p.status}
+                    onChange={e=>updateStatus(p.id, e.target.value)}
+                    style={{
+                      borderColor:sc.border,
+                      color:sc.text,
+                      background:sc.bg,
+                    }}
+                  >
+                    {STATUS_OPTIONS.map(s=><option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ===================== AUTH PAGES =====================
+function LoginPage({ setPage, setUser, showToast }) {
+  const [form, setForm] = useState({email:'',password:''});
+  const [errors, setErrors] = useState({});
+  const [showPwd, setShowPwd] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const validate = () => {
+    const e = {};
+    if(!form.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email)) e.email = 'Enter a valid email address';
+    if(!form.password || form.password.length < 6) e.password = 'Password must be at least 6 characters';
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const handleLogin = async () => {
+    if(!validate()) return;
+    setLoading(true);
+    await new Promise(r=>setTimeout(r,800));
+    setLoading(false);
+    // Mock auth — accept any valid-looking credentials
+    const name = form.email.split('@')[0];
+    setUser({ name, email: form.email, initials: name.slice(0,2).toUpperCase() });
+    showToast({ title:'Logged in!', msg:`Welcome back, ${name}`, icon:'fas fa-check-circle', bg:'#f0fdf4', color:'#16a34a' });
+    setPage('home');
+  };
+
+  return (
+    <div className="auth-wrapper">
+      <div className="auth-card">
+        <div className="auth-logo">
+          <div className="auth-logo-mark"><i className="fas fa-map-marker-alt"></i></div>
+          <div className="auth-logo-text">Madurai <span>Problem</span> Finder</div>
+        </div>
+        <div className="auth-title">Welcome back</div>
+        <div className="auth-subtitle">Login to report and track city issues</div>
+
+        <div className="form-group">
+          <label>Email Address</label>
+          <div className="input-with-icon">
+            <i className="fas fa-envelope input-icon"></i>
+            <input type="email" placeholder="you@example.com"
+              value={form.email} onChange={e=>setForm(f=>({...f,email:e.target.value}))}
+              style={{borderColor:errors.email?'var(--red)':''}}
+              onKeyDown={e=>e.key==='Enter'&&handleLogin()}
+            />
+          </div>
+          {errors.email && <div className="error-msg"><i className="fas fa-exclamation-circle"></i>{errors.email}</div>}
+        </div>
+
+        <div className="form-group">
+          <label>Password</label>
+          <div className="input-with-icon">
+            <i className="fas fa-lock input-icon"></i>
+            <input type={showPwd?'text':'password'} placeholder="Enter your password"
+              value={form.password} onChange={e=>setForm(f=>({...f,password:e.target.value}))}
+              style={{borderColor:errors.password?'var(--red)':''}}
+              onKeyDown={e=>e.key==='Enter'&&handleLogin()}
+            />
+            <i className={`fas fa-eye${showPwd?'-slash':''} input-icon-right`} onClick={()=>setShowPwd(!showPwd)}></i>
+          </div>
+          {errors.password && <div className="error-msg"><i className="fas fa-exclamation-circle"></i>{errors.password}</div>}
+        </div>
+
+        <div style={{textAlign:'right',marginBottom:16}}>
+          <a style={{fontSize:12.5,color:'var(--blue)',cursor:'pointer',fontWeight:500}}>Forgot password?</a>
+        </div>
+
+        <button className="auth-submit" onClick={handleLogin} disabled={loading}>
+          {loading ? <><i className="fas fa-circle-notch fa-spin"></i> Logging in...</> : <><i className="fas fa-sign-in-alt"></i> Login</>}
+        </button>
+
+        <div className="auth-divider">or</div>
+
+        <div style={{display:'flex',gap:10,marginBottom:4}}>
+          {[['fab fa-google','#ea4335','Google'],['fab fa-facebook','#1877f2','Facebook']].map(([icon,color,name])=>(
+            <button key={name} style={{flex:1,padding:'9px',border:'1.5px solid var(--border)',borderRadius:9,background:'white',fontFamily:'var(--font)',fontSize:13,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:7,color:'var(--text2)',fontWeight:500}}>
+              <i className={icon} style={{color,fontSize:14}}></i>{name}
+            </button>
+          ))}
+        </div>
+
+        <div className="auth-footer">
+          Don't have an account? <a onClick={()=>setPage('register')}>Register here</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RegisterPage({ setPage, setUser, showToast }) {
+  const [form, setForm] = useState({name:'',email:'',phone:'',password:'',confirm:''});
+  const [errors, setErrors] = useState({});
+  const [showPwd, setShowPwd] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const pwdStrength = form.password.length === 0 ? 0 : form.password.length < 6 ? 1 : form.password.length < 10 ? 2 : 3;
+  const strengthColor = ['#e5e7eb','#ef4444','#f59e0b','#22c55e'][pwdStrength];
+  const strengthLabel = ['','Weak','Fair','Strong'][pwdStrength];
+
+  const validate = () => {
+    const e = {};
+    if(!form.name || form.name.trim().length < 2) e.name = 'Name must be at least 2 characters';
+    if(!form.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email)) e.email = 'Enter a valid email address';
+    if(form.phone && !/^\d{10}$/.test(form.phone.replace(/\s/g,''))) e.phone = 'Enter a valid 10-digit phone number';
+    if(!form.password || form.password.length < 6) e.password = 'Password must be at least 6 characters';
+    if(form.password !== form.confirm) e.confirm = 'Passwords do not match';
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const handleRegister = async () => {
+    if(!validate()) return;
+    setLoading(true);
+    await new Promise(r=>setTimeout(r,800));
+    setLoading(false);
+    const initials = form.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    setUser({ name:form.name, email:form.email, initials });
+    showToast({ title:'Account created!', msg:`Welcome, ${form.name.split(' ')[0]}!`, icon:'fas fa-user-check', bg:'#f0fdf4', color:'#16a34a' });
+    setPage('home');
+  };
+
+  return (
+    <div className="auth-wrapper">
+      <div className="auth-card">
+        <div className="auth-logo">
+          <div className="auth-logo-mark"><i className="fas fa-map-marker-alt"></i></div>
+          <div className="auth-logo-text">Madurai <span>Problem</span> Finder</div>
+        </div>
+        <div className="auth-title">Create Account</div>
+        <div className="auth-subtitle">Join Madurai's civic improvement community</div>
+
+        <div className="form-row">
+          <div className="form-group" style={{marginBottom:0}}>
+            <label>Full Name *</label>
+            <div className="input-with-icon">
+              <i className="fas fa-user input-icon"></i>
+              <input placeholder="Your name" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} style={{borderColor:errors.name?'var(--red)':''}}/>
+            </div>
+            {errors.name && <div className="error-msg"><i className="fas fa-exclamation-circle"></i>{errors.name}</div>}
+          </div>
+          <div className="form-group" style={{marginBottom:0}}>
+            <label>Phone</label>
+            <div className="input-with-icon">
+              <i className="fas fa-phone input-icon"></i>
+              <input placeholder="10-digit number" value={form.phone} onChange={e=>setForm(f=>({...f,phone:e.target.value}))} style={{borderColor:errors.phone?'var(--red)':''}}/>
+            </div>
+            {errors.phone && <div className="error-msg"><i className="fas fa-exclamation-circle"></i>{errors.phone}</div>}
+          </div>
+        </div>
+
+        <div className="form-group" style={{marginTop:12}}>
+          <label>Email Address *</label>
+          <div className="input-with-icon">
+            <i className="fas fa-envelope input-icon"></i>
+            <input type="email" placeholder="you@example.com" value={form.email} onChange={e=>setForm(f=>({...f,email:e.target.value}))} style={{borderColor:errors.email?'var(--red)':''}}/>
+          </div>
+          {errors.email && <div className="error-msg"><i className="fas fa-exclamation-circle"></i>{errors.email}</div>}
+        </div>
+
+        <div className="form-group">
+          <label>Password *</label>
+          <div className="input-with-icon">
+            <i className="fas fa-lock input-icon"></i>
+            <input type={showPwd?'text':'password'} placeholder="Create a password" value={form.password} onChange={e=>setForm(f=>({...f,password:e.target.value}))} style={{borderColor:errors.password?'var(--red)':''}}/>
+            <i className={`fas fa-eye${showPwd?'-slash':''} input-icon-right`} onClick={()=>setShowPwd(!showPwd)}></i>
+          </div>
+          {form.password.length > 0 && (
+            <div>
+              <div className="password-strength" style={{background:strengthColor,width:`${pwdStrength*33.3}%`}}></div>
+              <div style={{fontSize:10.5,color:strengthColor,marginTop:3}}>{strengthLabel} password</div>
+            </div>
+          )}
+          {errors.password && <div className="error-msg"><i className="fas fa-exclamation-circle"></i>{errors.password}</div>}
+        </div>
+
+        <div className="form-group">
+          <label>Confirm Password *</label>
+          <div className="input-with-icon">
+            <i className="fas fa-lock input-icon"></i>
+            <input type="password" placeholder="Re-enter password" value={form.confirm} onChange={e=>setForm(f=>({...f,confirm:e.target.value}))} style={{borderColor:errors.confirm?'var(--red)':''}}/>
+          </div>
+          {errors.confirm && <div className="error-msg"><i className="fas fa-exclamation-circle"></i>{errors.confirm}</div>}
+        </div>
+
+        <button className="auth-submit" onClick={handleRegister} disabled={loading}>
+          {loading ? <><i className="fas fa-circle-notch fa-spin"></i> Creating Account...</> : <><i className="fas fa-user-plus"></i> Create Account</>}
+        </button>
+
+        <div className="auth-footer">
+          Already have an account? <a onClick={()=>setPage('login')}>Login</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ===================== APP ROOT =====================
+function App() {
+  const [page, setPage] = useState('home');
+  const [problems, setProblems] = useState(INITIAL_PROBLEMS);
+  const [user, setUser] = useState(null);
+  const [toasts, setToasts] = useState([]);
+
+  const showToast = useCallback((opts) => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, ...opts }]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
+  }, []);
+
+  const removeToast = (id) => setToasts(prev => prev.filter(t => t.id !== id));
+
+  const addProblem = (p) => {
+    setProblems(prev => [...prev, p]);
+    showToast({ title:'Problem Reported!', msg:`${p.id} added to the system`, icon:'fas fa-check-circle', bg:'#f0fdf4', color:'#16a34a' });
+  };
+
+  const updateProblem = (id, updates) => {
+    setProblems(prev => prev.map(p => p.id === id ? {...p,...updates} : p));
+  };
+
+  const navItems = [
+    { key:'home', label:'Home', icon:'fas fa-home' },
+    { key:'map', label:'Map View', icon:'fas fa-map-marked-alt' },
+    { key:'report', label:'Report Problem', icon:'fas fa-plus-circle' },
+    { key:'problems', label:'View Problems', icon:'fas fa-list' },
+  ];
+
+  const pending = problems.filter(p=>p.status==='Pending').length;
+
+  return (
+    <div className="app-shell">
+      {/* Topbar */}
+      <div className="topbar">
+        <div className="topbar-logo" onClick={()=>setPage('home')}>
+          <div className="logo-mark"><i className="fas fa-map-marker-alt"></i></div>
+          <div className="logo-text">Madurai <span>Finder</span></div>
+        </div>
+        <nav className="topbar-nav">
+          {navItems.map(n=>(
+            <button key={n.key} className={`nav-item${page===n.key?' active':''}`} onClick={()=>setPage(n.key)}>
+              {n.label}
+              {n.key==='problems' && pending>0 && (
+                <span style={{marginLeft:5,background:'var(--red)',color:'white',borderRadius:'10px',padding:'1px 7px',fontSize:10,fontWeight:700}}>
+                  {pending}
+                </span>
+              )}
+            </button>
+          ))}
+        </nav>
+        <div className="topbar-right">
+          <Clock />
+          {user ? (
+            <div className="user-chip" onClick={()=>{setUser(null);setPage('home');showToast({title:'Logged out',msg:'See you again!',icon:'fas fa-sign-out-alt',bg:'#fef2f2',color:'var(--red)'});}}>
+              <div className="user-avatar-sm">{user.initials}</div>
+              <span className="user-chip-name">{user.name.split(' ')[0]}</span>
+              <i className="fas fa-chevron-down" style={{fontSize:10,color:'var(--text3)'}}></i>
+            </div>
+          ) : (
+            <div style={{display:'flex',gap:8}}>
+              <button className="btn btn-secondary btn-sm" onClick={()=>setPage('login')}>
+                <i className="fas fa-sign-in-alt"></i> Login
+              </button>
+              <button className="btn btn-primary btn-sm" onClick={()=>setPage('register')}>
+                <i className="fas fa-user-plus"></i> Register
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Pages */}
+      {page==='home' && <HomePage problems={problems} setPage={setPage} />}
+      {page==='map' && <MapPage problems={problems} />}
+      {page==='report' && <ReportPage addProblem={addProblem} setPage={setPage} />}
+      {page==='problems' && <ProblemsPage problems={problems} updateProblem={updateProblem} />}
+      {page==='login' && <LoginPage setPage={setPage} setUser={setUser} showToast={showToast} />}
+      {page==='register' && <RegisterPage setPage={setPage} setUser={setUser} showToast={showToast} />}
+
+      {/* Toasts */}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById('root'));
+</script>
+</body>
+</html>
